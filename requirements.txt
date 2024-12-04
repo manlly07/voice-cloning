@@ -4,3 +4,4 @@ librosa
 scipy
 numpy
 tkinter==3.10.5
+matplotlib
