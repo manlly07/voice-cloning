@@ -7,8 +7,12 @@ import threading
 import time
 import librosa
 import numpy as np
-from scipy.io.wavfile import write
+from scipy.io.wavfile import read, write
 import scipy.signal as signal
+from scipy.signal import firwin, lfilter, kaiserord  # Thêm kaiserord vào
+import noisereduce as nr
+import soundfile as sf
+
 
 # Biến cờ và trạng thái
 stop_flag = threading.Event()
@@ -18,6 +22,33 @@ current_position = 0  # Vị trí phát âm thanh hiện tại
 is_audio_playing = False  # Biến theo dõi trạng thái phát âm thanh
 p = None  # Biến lưu instance của PyAudio
 stream = None  # Biến lưu stream âm thanh
+
+def reduce_noise(input_path, output_path):
+    y, sr = librosa.load(input_path)
+    y_denoised = nr.reduce_noise(y=y, sr=sr)
+    sf.write(output_path, y_denoised, sr)
+
+def bandPassFilter(input_path, output_path):
+    # Đọc file WAV
+    fs, signal = read(input_path)
+
+    # Tạo bộ lọc Bandpass
+    nyq_rate = fs / 2.0
+    low_cutoff_hz = 300.0
+    high_cutoff_hz = 3400.0
+    width = 500.0 / nyq_rate
+    ripple_db = 60.0
+
+    N, beta = kaiserord(ripple_db, width)
+    if N % 2 == 0:
+        N += 1
+    hBP_FIR = firwin(N, [low_cutoff_hz / nyq_rate, high_cutoff_hz / nyq_rate], window=('kaiser', beta), pass_zero=False)
+
+    # Áp dụng bộ lọc Bandpass
+    filtered_signal = lfilter(hBP_FIR, 1.0, signal)
+
+    # Ghi tín hiệu đã lọc ra file WAV
+    write(output_path, fs, np.int16(filtered_signal))
 
 def normalize_audio(y):
     return y / np.max(np.abs(y)) if np.max(np.abs(y)) > 0 else y
@@ -114,12 +145,20 @@ def transform_audio():
         if not file_path:
             raise ValueError("Vui lòng chọn file âm thanh.")
 
+        # Lọc nhiễu
+        reduce_noise(file_path, output_file)
+
+        # Lọc tần số
+        bandPassFilter(output_file, output_file)
+
+
         # Đọc file wav
         # sound = AudioSegment.from_wav(file_path)
-        y, sr = librosa.load(file_path)
+        y, sr = librosa.load(output_file)
         # Lấy lựa chọn từ người dùng
         selected_option = character_option.get()
         pitch_shift_value = float(entry_pitch_shift.get())
+
 
 
         # Biến đổi âm thanh theo nhân vật
