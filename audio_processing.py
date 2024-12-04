@@ -1,7 +1,6 @@
 import threading
 import time
 import librosa
-import librosa.display
 import numpy as np
 from scipy.io.wavfile import write
 import scipy.signal as signal
