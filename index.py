@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import filedialog, messagebox
 from pydub import AudioSegment, effects
 import pyaudio
@@ -241,52 +242,60 @@ def clear_audio():
     stop_flag.clear()
     pause_flag.clear()
 
+def browse_file():
+    filename = filedialog.askopenfilename(filetypes=[("Audio Files", "*.wav")])
+    if filename:
+        file_label.config(text=filename)
+
 # Giao diện chính
 root = tk.Tk()
 root.title("Biến Đổi Âm Thanh WAV")
-root.geometry("400x400")
+root.geometry("500x500")
+root.configure(bg='#f0f0f0')  # Light grey background
+
+frame = tk.Frame(root)
+frame.pack(padx=10, pady=10)
 
 # Chọn file âm thanh
-label_file = tk.Label(root, text="Chọn file WAV:")
-label_file.pack(pady=5)
+label_file = tk.Label(frame, text="Chọn file WAV:")
+label_file.grid(row=0, column=0, sticky="w", pady=5)
 
-entry_file = tk.Entry(root, width=40)
-entry_file.pack(pady=5)
+entry_file = tk.Entry(frame, width=40)
+entry_file.grid(row=1, column=0, pady=5)
 
-button_browse = tk.Button(root, text="Duyệt", command=open_file)
-button_browse.pack(pady=5)
+button_browse = tk.Button(frame, text="Duyệt", command=open_file)
+button_browse.grid(row=1, column=1, padx=5)
 
 # Tùy chọn nhân vật
-label_option = tk.Label(root, text="Chọn nhân vật:")
-label_option.pack(pady=5)
+label_option = tk.Label(frame, text="Chọn nhân vật:")
+label_option.grid(row=2, column=0, sticky="w", pady=5)
 
 character_option = tk.StringVar()
 character_option.set("Conan")  # Default value
-
 options = ["Conan", "Shin", "Doraemon", "Suspect", "Mẹ Shin", "Nobita", "Clown", "Donald"]
-dropdown = tk.OptionMenu(root, character_option, *options)
-dropdown.pack(pady=5)
+character_menu = ttk.OptionMenu(frame, character_option, *options)
+character_menu.grid(row=2, column=1, pady=5)
 
-label_pitch_shift = tk.Label(root, text="Thay đổi cao độ (bước):")
-label_pitch_shift.pack(pady=5)
-entry_pitch_shift = tk.Entry(root, width=10)
-entry_pitch_shift.pack(pady=5)
+label_pitch_shift = tk.Label(frame, text="Pitch Shift")
+label_pitch_shift.grid(row=3, column=0, sticky="w", pady=5)
+
+entry_pitch_shift = tk.Entry(frame, width=10)
+entry_pitch_shift.grid(row=3, column=1, pady=5)
 entry_pitch_shift.insert(0, "0")  # Mặc định là không thay đổi cao độ
 
 # Nút chuyển đổi âm thanh
-button_transform = tk.Button(root, text="Biến Đổi Âm Thanh", command=transform_audio)
-button_transform.pack(pady=20)
+button_transform = tk.Button(frame, text="Transform Audio", command=transform_audio, width=25)
+button_transform.grid(row=4, column=0, pady=5)
 
 # Nút Pause và Resume
-button_pause = tk.Button(root, text="Pause", command=pause_audio)
-button_pause.pack(pady=5)
+button_pause = ttk.Button(frame, text="Pause Audio", command=pause_audio, width=25)
+button_pause.grid(row=5, column=0, pady=5)
 
-button_resume = tk.Button(root, text="Resume", command=resume_audio)
-button_resume.pack(pady=5)
+button_resume = ttk.Button(frame, text="Resume Audio", command=resume_audio, width=25)
+button_resume.grid(row=5, column=1, pady=5)
 
 # Nút Clear (dừng hoàn toàn và giải phóng tài nguyên)
-button_clear = tk.Button(root, text="Clear", command=clear_audio)
-button_clear.pack(pady=5)
-
+button_clear = ttk.Button(frame, text="Clear Audio", command=clear_audio, width=25)
+button_clear.grid(row=6, column=0, pady=5)
 # Chạy giao diện
 root.mainloop()
