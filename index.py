@@ -241,12 +241,7 @@ def clear_audio():
     is_audio_playing = False
     stop_flag.clear()
     pause_flag.clear()
-
-def browse_file():
-    filename = filedialog.askopenfilename(filetypes=[("Audio Files", "*.wav")])
-    if filename:
-        file_label.config(text=filename)
-
+    
 # Giao diện chính
 root = tk.Tk()
 root.title("Biến Đổi Âm Thanh WAV")
